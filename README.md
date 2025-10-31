@@ -26,13 +26,12 @@ It streamlines commit message creation with features like scope detection, custo
 ```bash
 # Add Tap
 brew tap meso1007/tagoly
-
 # Install
 brew install meso1007/tagoly/tagoly
-
 # Verify
 tagoly --version
 tagoly
+```
 
 
 #### 2. Manual Installation
