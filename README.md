@@ -95,10 +95,10 @@ Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
 ## Usage
 ```bash
 git add .
-tagoly
+tagoly   # run Tagoly to select commit type, scope, and enter message interactively
 ```
 
-## リポジトリ
+## Repository
 
 - Tagoly main: [https://github.com/meso1007/tagoly](https://github.com/meso1007/tagoly)  
 - Homebrew Tap: [https://github.com/meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly)  
