@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"tagoly/internal/prompt"
 )
 
 type Config struct {
-	CustomTags []string `json:"customTags"`
+	CustomTags []prompt.CommitType `json:"customTags"`
 }
 
 func LoadConfig() (*Config, error) {

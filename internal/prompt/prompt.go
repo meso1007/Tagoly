@@ -12,7 +12,6 @@ type CommitType struct {
 	Label string
 }
 
-// Standard Commit Types
 var defaultCommitTypes = []CommitType{
 	{"feat", "New feature"},
 	{"fix", "Bug fix"},
@@ -22,18 +21,15 @@ var defaultCommitTypes = []CommitType{
 	{"chore", "Maintenance"},
 }
 
-// Select commit type, also supporting custom tags
 func SelectCommitType(customTags []CommitType) string {
 	options := []string{}
 
-	// Standard tags
 	for _, c := range defaultCommitTypes {
 		options = append(options, fmt.Sprintf("%s (%s)", c.Key, c.Label))
 	}
 
-	// Custom tags
 	for _, ct := range customTags {
-		options = append(options, fmt.Sprintf("%s (%s, Custom)", ct.Key, ct.Label))
+		options = append(options, fmt.Sprintf("%s (%s)", ct.Key, ct.Label))
 	}
 
 	var selected string
@@ -44,14 +40,14 @@ func SelectCommitType(customTags []CommitType) string {
 	}
 	survey.AskOne(prompt, &selected)
 
-	// Return the key based on the selection result
+	// 選択されたものから key を返す
 	for _, c := range defaultCommitTypes {
 		if selected == fmt.Sprintf("%s (%s)", c.Key, c.Label) {
 			return c.Key
 		}
 	}
 	for _, ct := range customTags {
-		if selected == fmt.Sprintf("%s (%s, Custom)", ct.Key, ct.Label) {
+		if selected == fmt.Sprintf("%s (%s)", ct.Key, ct.Label) {
 			return ct.Key
 		}
 	}

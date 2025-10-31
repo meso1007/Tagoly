@@ -1,5 +1,8 @@
 {
-  "hello": [
-    "feat"
+  "customTags": [
+    {"key": "ci", "label": "CI/CD changes"},
+    {"key": "perf", "label": "Performance improvement"},
+    {"key": "test", "label": "Add or update tests"},
+    {"key": "hotfix", "label": "Hotfix / urgent fix"}
   ]
 }

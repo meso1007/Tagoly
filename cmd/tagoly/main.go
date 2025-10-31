@@ -14,24 +14,24 @@ import (
 )
 
 func main() {
-	// 1. Load config
+	// 1. 設定読み込み
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load configuration: ", err)
 	}
 
-	// 2. Get staged files
+	// 2. ステージ済みファイル取得
 	files, err := git.GetChangedFiles()
 	if err != nil {
 		log.Fatal("Failed to get changed files: ", err)
 	}
 
-	// 3. Detect scope
+	// 3. スコープ検出
 	scope, scopeList := generator.DetectScopeWithListImproved(files)
 	if len(scopeList) > 1 {
 		fmt.Println("Multiple scopes detected:", scopeList)
 		promptScope := &survey.Select{
-			Message:  "Select target scope:",
+			Message:  "Select the scope for the commit:",
 			Options:  scopeList,
 			PageSize: 10,
 			Default:  scope,
@@ -43,22 +43,14 @@ func main() {
 		scope = ""
 	}
 
-	// 4. Convert custom tags (from config) into CommitType structs
-	var customCommitTypes []prompt.CommitType
-	for _, tag := range cfg.CustomTags {
-		customCommitTypes = append(customCommitTypes, prompt.CommitType{
-			Key:   tag,
-			Label: "Custom tag",
-		})
-	}
-
-	// 5. Select commit type
+	// 4. タグ選択
+	customCommitTypes := cfg.CustomTags
 	tag := prompt.SelectCommitType(customCommitTypes)
 
-	// 6. Enter commit message
+	// 5. メッセージ入力
 	message := prompt.InputCommitMessage()
 
-	// 7. Generate final commit message
+	// 6. コミットメッセージ生成
 	var finalMessage string
 	if scope != "" {
 		finalMessage = fmt.Sprintf("%s(%s): %s", tag, scope, message)
@@ -66,14 +58,14 @@ func main() {
 		finalMessage = fmt.Sprintf("%s: %s", tag, message)
 	}
 
-	// 8. Confirm before committing
+	// 7. 確認して git commit
 	fmt.Println("\nFinal commit message:")
 	fmt.Println(finalMessage)
 
-	if prompt.ConfirmCommit(finalMessage) {
+	if prompt.ConfirmCommit("Commit with this message?") {
 		cmd := exec.Command("git", "commit", "-m", finalMessage)
 		if err := cmd.Run(); err != nil {
-			log.Fatal("Failed to execute git commit: ", err)
+			log.Fatal("git commit の実行に失敗しました: ", err)
 		}
 		fmt.Println("✅ Commit completed successfully!")
 	} else {

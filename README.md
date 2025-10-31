@@ -1,41 +1,41 @@
 # Tagoly
 
-Tagoly は、Git コミットをスマートに支援する CLI ツールです。  
-スコープ検出・カスタムタグ対応・インタラクティブな選択など、手動でのコミットメッセージ作成を効率化します。
+Tagoly is a smart CLI tool to assist with Git commits.  
+It streamlines commit message creation with features like scope detection, custom tags, and interactive selection.
 
-## 🚀 主な機能
+## 🚀 Key Features
 
-- **自動スコープ検出**  
-  変更されたファイルパスから自動的にスコープを判定
+- **Automatic Scope Detection**  
+  Detects the scope based on changed file paths automatically.
 
-- **カスタムタグ対応**  
-  `.tagolyrc` に自分専用のタグを定義可能（例：ci, perf など）
+- **Custom Tag Support**  
+  Define your own tags in `.tagolycustom` (e.g., ci, perf).
 
-- **対話的コミット生成**  
-  commit type / scope / message を順にインタラクティブに選択
+- **Interactive Commit Generation**  
+  Step-by-step selection for commit type, scope, and message.
 
-- **スマートスコープ選択**  
-  複数スコープが含まれる場合は最も多いものを自動選択  
-  必要に応じて手動で選択可能
+- **Smart Scope Selection**  
+  Automatically selects the most frequent scope if multiple scopes exist.  
+  Allows manual selection if needed.
 
-## インストール方法
+## Installation
 
 ### **MacOS**
 
 #### 1. Homebrew
 ```bash
-# Tap を追加
+# Add Tap
 brew tap meso1007/tagoly
 
-# インストール
+# Install
 brew install meso1007/tagoly/tagoly
 
-# 動作確認
+# Verify
 tagoly --version
 tagoly
-```
 
-#### 2. 手動インストール
+
+#### 2. Manual Installation
 ##### Apple Silicon (M1/M2)
 ```bash
 mv tagoly-darwin-arm64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
@@ -52,7 +52,7 @@ mv tagoly-darwin-amd64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
 brew tap meso1007/tagoly
 brew install meso1007/tagoly/tagoly
 ```
-#### 2. 手動インストール
+#### 2. Manual Installation
 ```bash
 mv tagoly-linux-amd64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
 ```
@@ -61,31 +61,38 @@ mv tagoly-linux-amd64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
 ### **Windows**
 #### 1. Scoop
 ```powershell
-# バケットを追加
+# Add bucket
 scoop bucket add tagoly https://github.com/meso1007/scoop-tagoly
 
-# インストール
+# Install
 scoop install tagoly/tagoly
 
-# 動作確認
+# Verify
 tagoly --version
 tagoly
+
 ```
-#### 2. 手動インストール
+#### 2. Manual Installation
 ```powershell
-Move-Item .\tagoly.exe "C:\Program Files\tagoly\tagoly.exe"
+Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
 ```
 
 --------
 
-## 設定ファイル .tagolyrc
+## Configuration File .tagolycustom
 ```json
 {
-  "customTags": ["ci", "perf"]
+  "customTags": [
+    {"key": "ci", "label": "CI/CD changes"},
+    {"key": "perf", "label": "Performance improvement"},
+    {"key": "test", "label": "Add or update tests"},
+    {"key": "hotfix", "label": "Hotfix / urgent fix"}
+  ]
 }
+
 ```
 
-## 使用方法
+## Usage
 ```bash
 git add .
 tagoly
@@ -93,8 +100,8 @@ tagoly
 
 ## リポジトリ
 
-- Tagoly 本体: [https://github.com/meso1007/tagoly](https://github.com/meso1007/tagoly)  
+- Tagoly main: [https://github.com/meso1007/tagoly](https://github.com/meso1007/tagoly)  
 - Homebrew Tap: [https://github.com/meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly)  
-- Scoop バケット: [https://github.com/meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly)
+- Scoop bucket: [https://github.com/meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly)
 
 ---

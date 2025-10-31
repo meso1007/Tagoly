@@ -1,0 +1,20 @@
+# Tagoly 設定やキャッシュ
+.tagoly.json       # 個人用の設定・キャッシュ
+*.exe              # ビルド済み Windows 実行ファイル
+tagoly-darwin-*    # Mac用ビルドファイル
+tagoly-linux-*     # Linux用ビルドファイル
+
+# OS やエディタ関連
+.DS_Store          # macOS のメタデータ
+Thumbs.db          # Windows のサムネイルキャッシュ
+*.swp              # Vim スワップファイル
+*.tmp              # 一時ファイル
+
+# Go 関連
+bin/               # 手動で作った実行バイナリ
+*.exe              # Windows 用ビルドバイナリ
+vendor/            # 外部依存を vendoring している場合
+
+# IDE / エディタ
+.idea/             # IntelliJ 系
+.vscode/           # VSCode
