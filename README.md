@@ -52,24 +52,8 @@ tagoly
 
 | Manual Commit | Tagoly |
 | :---------------------------: | :--------------------------: |
-<table style="width: 100%;">
-  <thead>
-    <tr>
-      <th style="width: 50%; text-align: center;">Manual Commit</th>
-      <th style="width: 50%; text-align: center;">Tagoly</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: center;">
-        <img src="./assets/readme/Manual-Commit.png" width="80%" alt="Manual commit screenshot" />
-      </td>
-      <td style="text-align: center;">
-        <img src="./assets/readme/Tagoly-Commitment.png" width="80%" alt="Tagoly interactive demo" />
-      </td>
-    </tr>
-  </tbody>
-</table>
+| <img src="./assets/readme/Manual-Commit.png" width="400" height="140" alt="Manual commit screenshot" /> | <img src="./assets/readme/Tagoly-Commitment.png" width="400" height="140"   alt="Tagoly interactive demo" /> |
+
 ### Git Log Comparison
 
 <p align="center">
