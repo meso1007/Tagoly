@@ -65,7 +65,7 @@ func main() {
 	if prompt.ConfirmCommit("Commit with this message?") {
 		cmd := exec.Command("git", "commit", "-m", finalMessage)
 		if err := cmd.Run(); err != nil {
-			log.Fatal("git commit の実行に失敗しました: ", err)
+			log.Fatal("Failed to execute git commit: ", err)
 		}
 		fmt.Println("✅ Commit completed successfully!")
 	} else {

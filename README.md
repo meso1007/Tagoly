@@ -1,24 +1,82 @@
-# Tagoly
+<h1 align="center">🏷️ Tagoly</h1>
+<p align="center">
+  <b>Smart CLI tool to streamline your Git commits.</b><br/>
+  <sub>Stop typing long commit messages — Tagoly makes it instant.</sub>
+</p>
+<p align="center">
+  <img src="./assets/readme/demo.gif" width="80%" alt="Tagoly CLI Demo" />
+</p>
 
-Tagoly is a smart CLI tool to assist with Git commits.  
-It streamlines commit message creation with features like scope detection, custom tags, and interactive selection.
+---
 
 ## 🚀 Key Features
 
-- **Automatic Scope Detection**  
-  Detects the scope based on changed file paths automatically.
+✅ **Automatic Scope Detection** Detects the commit scope (e.g., `feature/login`, `docs/readme`) based on the paths of staged files.
 
-- **Custom Tag Support**  
-  Define your own tags in `.tagolycustom` (e.g., ci, perf).
+✅ **Custom Tag Support** Enhance your workflow by defining your own commit tags in `.tagolycustom` (e.g., `ci`, `perf`, `hotfix`).
 
-- **Interactive Commit Generation**  
-  Step-by-step selection for commit type, scope, and message.
+✅ **Interactive Commit Generation** Provides a simple, step-by-step selection process for commit type, scope, and subject message.
 
-- **Smart Scope Selection**  
-  Automatically selects the most frequent scope if multiple scopes exist.  
-  Allows manual selection if needed.
+✅ **Smart Scope Selection** When multiple scopes are detected, Tagoly automatically suggests the most relevant scope or lets you choose manually.
 
-## Installation
+---
+
+## ⚡️ Quick Start
+
+Tagoly is a drop-in replacement for the standard `git commit` workflow.
+
+> ⚠️ **Note for Manual Installers:** If you download the binary directly, ensure you place it in a directory listed in your system's **PATH** (e.g., `/usr/local/bin`) to run it from any location.
+
+```bash
+# 1. Install Tagoly (Example: Homebrew)
+brew tap meso1007/tagoly
+brew install meso1007/tagoly/tagoly
+
+git init   # if your repo is not initialized yet
+
+# 2. Stage your changes
+git add .
+
+# 3. Run Tagoly interactively
+tagoly
+```
+```powershell
+# Windows (Scoop)
+scoop bucket add tagoly https://github.com/meso1007/scoop-tagoly
+scoop install tagoly/tagoly
+tagoly --version
+tagoly
+```
+
+## 🧩 Before / After
+
+| Manual Commit | Tagoly |
+| :---------------------------: | :--------------------------: |
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th style="width: 50%; text-align: center;">Manual Commit</th>
+      <th style="width: 50%; text-align: center;">Tagoly</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center;">
+        <img src="./assets/readme/Manual-Commit.png" width="80%" alt="Manual commit screenshot" />
+      </td>
+      <td style="text-align: center;">
+        <img src="./assets/readme/Tagoly-Commitment.png" width="80%" alt="Tagoly interactive demo" />
+      </td>
+    </tr>
+  </tbody>
+</table>
+### Git Log Comparison
+
+<p align="center">
+  <img src="./assets/readme/Commit-Log.png" alt="Git log before Tagoly" />
+</p>
+
+## ⚙️ Installation Details
 
 ### **MacOS**
 
@@ -35,6 +93,7 @@ tagoly
 
 
 #### 2. Manual Installation
+> Ensure `/usr/local/bin` (or another directory in your $PATH) exists and is accessible.
 ##### Apple Silicon (M1/M2)
 ```bash
 mv tagoly-darwin-arm64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
@@ -52,8 +111,14 @@ brew tap meso1007/tagoly
 brew install meso1007/tagoly/tagoly
 ```
 #### 2. Manual Installation
+AMD64
 ```bash
 mv tagoly-linux-amd64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
+```
+
+ARM64
+```bash
+mv tagoly-linux-arm64 /usr/local/bin/tagoly && chmod +x /usr/local/bin/tagoly
 ```
 --------
 
@@ -72,13 +137,12 @@ tagoly
 
 ```
 #### 2. Manual Installation
+> Make sure "C:\Program Files\tagoly" is in your PATH to run Tagoly from any terminal.
 ```powershell
 Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
 ```
 
---------
-
-## Configuration File .tagolycustom
+## 🧠 Configuration Example
 ```json
 {
   "customTags": [
@@ -88,19 +152,24 @@ Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
     {"key": "hotfix", "label": "Hotfix / urgent fix"}
   ]
 }
-
 ```
+### 📍 Save this file as .tagolycustom in your repository root.
 
-## Usage
+## 💻 Usage
 ```bash
 git add .
-tagoly   # run Tagoly to select commit type, scope, and enter message interactively
+tagoly   # Run Tagoly to select commit type, scope, and enter message interactively
 ```
-
-## Repository
-
-- Tagoly main: [https://github.com/meso1007/tagoly](https://github.com/meso1007/tagoly)  
-- Homebrew Tap: [https://github.com/meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly)  
-- Scoop bucket: [https://github.com/meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly)
+## 📦 Related Repositories
+| Type         | Repository                                                              |
+| ------------ | ----------------------------------------------------------------------- |
+| Main         | [meso1007/tagoly](https://github.com/meso1007/tagoly)                   |
+| Homebrew Tap | [meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly) |
+| Scoop Bucket | [meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly)       |
 
 ---
+
+<p align="center">
+  ⭐️ <b>If you find Tagoly useful, please give it a star!</b><br/>
+  <sub>It helps the project grow and reach more developers 🚀</sub>
+</p>

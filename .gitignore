@@ -5,6 +5,7 @@
 tagoly-darwin-*
 tagoly-linux-*
 tagoly-windows-*.exe
+.assets/
 
 # OS / エディタ
 .DS_Store
