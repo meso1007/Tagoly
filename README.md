@@ -4,7 +4,7 @@
   <sub>Stop typing long commit messages — Tagoly makes it instant.</sub>
 </p>
 <p align="center">
-  <img src="./assets/readme/demo.gif" width="80%" alt="Tagoly CLI Demo" />
+  <img src="./assets/readme/demo-crop.gif" width="80%" alt="Tagoly CLI Demo" />
 </p>
 
 ---
