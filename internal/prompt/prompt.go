@@ -21,6 +21,18 @@ var defaultCommitTypes = []CommitType{
 	{"chore", "Maintenance"},
 }
 
+func SelectScope(scopes []string, defaultScope string) string {
+	var selected string
+	prompt := &survey.Select{
+		Message:  "Select the scope for the commit:",
+		Options:  scopes,
+		PageSize: 10,
+		Default:  defaultScope,
+	}
+	survey.AskOne(prompt, &selected)
+	return selected
+}
+
 func SelectCommitType(customTags []CommitType) string {
 	options := []string{}
 

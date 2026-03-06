@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"tagoly/internal/prompt"
@@ -14,14 +15,16 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	cfg := &Config{}
 
-	// プロジェクト直下
 	if _, err := os.Stat(".tagolycustom"); err == nil {
-		data, _ := os.ReadFile(".tagolycustom")
-		json.Unmarshal(data, cfg)
-		return cfg, nil
+		data, err := os.ReadFile(".tagolycustom")
+		if err != nil {
+			if err := json.Unmarshal(data, cfg); err != nil {
+				return nil, fmt.Errorf("invalid json in .tagolycustom: %w", err)
+			}
+			return cfg, nil
+		}
 	}
 
-	// ホームディレクトリ直下
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return cfg, err

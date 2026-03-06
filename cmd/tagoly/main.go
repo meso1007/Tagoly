@@ -3,18 +3,19 @@ package main
 import (
 	"fmt"
 	"log"
-	"os/exec"
-
 	"tagoly/internal/config"
 	"tagoly/internal/generator"
 	"tagoly/internal/git"
 	"tagoly/internal/prompt"
-
-	"github.com/AlecAivazis/survey/v2"
 )
 
 func main() {
-	// 1. 設定読み込み
+
+	if !git.HasStagedChanges() {
+		fmt.Println("No staged files to commit. Please run 'git add' first.")
+		return
+	}
+	// 1. setting load
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load configuration: ", err)
@@ -30,13 +31,7 @@ func main() {
 	scope, scopeList := generator.DetectScopeWithListImproved(files)
 	if len(scopeList) > 1 {
 		fmt.Println("Multiple scopes detected:", scopeList)
-		promptScope := &survey.Select{
-			Message:  "Select the scope for the commit:",
-			Options:  scopeList,
-			PageSize: 10,
-			Default:  scope,
-		}
-		survey.AskOne(promptScope, &scope)
+		scope = prompt.SelectScope(scopeList, scope)
 	}
 
 	if scope == "root" {
@@ -63,8 +58,7 @@ func main() {
 	fmt.Println(finalMessage)
 
 	if prompt.ConfirmCommit("Commit with this message?") {
-		cmd := exec.Command("git", "commit", "-m", finalMessage)
-		if err := cmd.Run(); err != nil {
+		if err := git.Commit(finalMessage); err != nil {
 			log.Fatal("Failed to execute git commit: ", err)
 		}
 		fmt.Println("✅ Commit completed successfully!")
