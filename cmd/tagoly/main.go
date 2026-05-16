@@ -252,6 +252,31 @@ func (m model) View() string {
 }
 
 func main() {
+	// Check for subcommands
+	if len(os.Args) > 1 {
+		subcommand := os.Args[1]
+
+		switch subcommand {
+		case "search":
+			if err := processSearchCommand(os.Args[2:]); err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		case "help", "-h", "--help":
+			printHelp()
+			return
+		case "version", "-v", "--version":
+			fmt.Println("tagoly version 1.0.0")
+			return
+		}
+	}
+
+	// Default behavior: interactive commit creation
+	runInteractiveCommit()
+}
+
+func runInteractiveCommit() {
 	if !git.HasStagedChanges() {
 		fmt.Println("No staged files to commit. Please run 'git add' first.")
 		return
@@ -302,4 +327,30 @@ func main() {
 	if m.committed {
 		fmt.Printf("\n✅ %s\n", styleSelected.Render("Committed: "+m.finalMessage()))
 	}
+}
+
+func printHelp() {
+	help := `Tagoly - The smarter Git commit CLI
+
+USAGE:
+  tagoly                          Run interactive commit creation
+  tagoly search [options]         Search commits by type, scope, or subject
+  tagoly help                     Show this help message
+  tagoly version                  Show version
+
+SEARCH OPTIONS:
+  -type <type>                    Filter by commit type (e.g., feat, fix, docs)
+  -scope <scope>                  Filter by scope (e.g., auth, api)
+  -subject <text>                 Filter by subject text (substring match)
+  -limit <number>                 Maximum number of results (0 = all)
+
+EXAMPLES:
+  tagoly search -type feat        Show all feature commits
+  tagoly search -scope auth       Show all commits in auth scope
+  tagoly search -type fix -limit 10  Show last 10 bug fixes
+  tagoly search -subject login    Show commits containing "login" in subject
+
+For more information, visit: https://github.com/meso1007/tagoly
+`
+	fmt.Println(help)
 }
