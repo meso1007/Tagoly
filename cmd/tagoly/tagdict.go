@@ -10,65 +10,29 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// --- Styling for tagdict ---
-var (
-	accentType     = lipgloss.Color("#EC4899")
-	accentScope    = lipgloss.Color("#06B6D4")
-	styleDictTitle = lipgloss.NewStyle().
-			Background(brandColor).
-			Foreground(textColor).
-			Padding(0, 3).
-			MarginBottom(1).
-			Bold(true)
-
-	styleDictSelected = lipgloss.NewStyle().
-				Foreground(brandColor).
-				Bold(true)
-
-	styleDictHelp = lipgloss.NewStyle().
-			Foreground(textMuted).
-			MarginTop(1)
-
-	styleDictType = lipgloss.NewStyle().
-			Foreground(accentType).
-			Bold(true)
-
-	styleDictScope = lipgloss.NewStyle().
-			Foreground(accentScope).
-			Bold(true)
-
-	styleDictResult = lipgloss.NewStyle().
-			Foreground(brandColor)
-)
-
 type dictStep int
 
 const (
 	dictStepSelectMode dictStep = iota
 	dictStepSelectType
 	dictStepSelectScope
-	dictStepSearching
 	dictStepResults
-	dictStepDone
 )
 
 type tagDictModel struct {
-	step           dictStep
-	cursor         int
-	allTypes       []string
-	allScopes      []string
-	selectedType   string
-	selectedScope  string
-	searchMode     string // "type", "scope", or "both"
-	results        []search.SearchResult
-	canceled       bool
-	err            error
-	resultsCursor  int
-	lastSearchOpts search.SearchOptions
+	step          dictStep
+	cursor        int
+	allTypes      []string
+	allScopes     []string
+	selectedType  string
+	selectedScope string
+	searchMode    string // "type" or "scope"
+	results       []search.SearchResult
+	resultsCursor int
+	canceled      bool
 }
 
 func newTagDictModel() *tagDictModel {
-	// Load configuration to get all available types
 	cfg, _ := config.LoadConfig()
 
 	types := []string{}
@@ -81,21 +45,16 @@ func newTagDictModel() *tagDictModel {
 		}
 	}
 
+	scopes := []string{
+		"root", "auth", "api", "ui", "db",
+		"config", "test", "docs", "ci", "perf",
+	}
+
 	return &tagDictModel{
-		step:     dictStepSelectMode,
-		cursor:   0,
-		allTypes: types,
-		allScopes: []string{
-			"root",
-			"auth",
-			"api",
-			"ui",
-			"db",
-			"config",
-			"test",
-			"docs",
-			"ci",
-		},
+		step:      dictStepSelectMode,
+		cursor:    0,
+		allTypes:  types,
+		allScopes: scopes,
 	}
 }
 
@@ -134,6 +93,7 @@ func (m *tagDictModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.cursor = 0
 				}
 			}
+
 		case dictStepSelectType:
 			switch msg.String() {
 			case "up", "k":
@@ -153,6 +113,7 @@ func (m *tagDictModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.step = dictStepSelectMode
 				m.cursor = 0
 			}
+
 		case dictStepSelectScope:
 			switch msg.String() {
 			case "up", "k":
@@ -172,6 +133,7 @@ func (m *tagDictModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.step = dictStepSelectMode
 				m.cursor = 0
 			}
+
 		case dictStepResults:
 			switch msg.String() {
 			case "up", "k":
@@ -182,7 +144,10 @@ func (m *tagDictModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if m.resultsCursor < len(m.results)-1 {
 					m.resultsCursor++
 				}
-			case "enter", "esc", "q":
+			case "esc":
+				m.step = dictStepSelectMode
+				m.cursor = 0
+			case "q":
 				return m, tea.Quit
 			}
 		}
@@ -196,74 +161,73 @@ func (m *tagDictModel) performSearch() {
 		Scope: m.selectedScope,
 		Limit: 0,
 	}
-	m.lastSearchOpts = opts
 
-	results, err := search.Search(opts)
-	if err != nil {
-		m.err = err
+	results, _ := search.Search(opts)
+	m.results = results
+	if m.results == nil {
 		m.results = []search.SearchResult{}
-	} else {
-		m.results = results
 	}
 }
 
 func (m *tagDictModel) View() string {
 	var b strings.Builder
-
-	b.WriteString(styleDictTitle.Render("TAGOLY SEARCH") + "\n\n")
+	b.WriteString(styleTitle.Render("TAGOLY SEARCH") + "\n\n")
 
 	switch m.step {
 	case dictStepSelectMode:
-		b.WriteString("What would you like to search by?\n\n")
+		b.WriteString("Search by:\n\n")
 		options := []string{"Commit Type", "Scope"}
 		for i, opt := range options {
-			line := "  " + opt
+			prefix := "  "
 			if m.cursor == i {
-				line = "❯ " + opt
-				b.WriteString(styleDictSelected.Render(line) + "\n")
+				prefix = "❯ "
+				b.WriteString(styleSelected.Render(prefix+opt) + "\n")
 			} else {
-				b.WriteString(line + "\n")
+				b.WriteString(prefix + opt + "\n")
 			}
 		}
-		b.WriteString(styleDictHelp.Render("↑/↓ or j/k: move  Enter: select  q: quit"))
+		b.WriteString(styleHelp.Render("\n↑/↓ or j/k: move  Enter: select  q: quit"))
 
 	case dictStepSelectType:
 		b.WriteString("Select commit type:\n\n")
 		for i, t := range m.allTypes {
-			line := "  " + t
+			prefix := "  "
 			if m.cursor == i {
-				line = "❯ " + t
-				b.WriteString(styleDictSelected.Render(line) + "\n")
+				prefix = "❯ "
+				b.WriteString(styleSelected.Render(prefix+t) + "\n")
 			} else {
-				b.WriteString(line + "\n")
+				b.WriteString(prefix + t + "\n")
 			}
 		}
-		b.WriteString(styleDictHelp.Render("↑/↓ or j/k: move  Enter: search  ESC: back  q: quit"))
+		b.WriteString(styleHelp.Render("\n↑/↓ or j/k: move  Enter: search  ESC: back  q: quit"))
 
 	case dictStepSelectScope:
 		b.WriteString("Select scope:\n\n")
 		for i, s := range m.allScopes {
-			line := "  " + s
+			prefix := "  "
 			if m.cursor == i {
-				line = "❯ " + s
-				b.WriteString(styleDictSelected.Render(line) + "\n")
+				prefix = "❯ "
+				b.WriteString(styleSelected.Render(prefix+s) + "\n")
 			} else {
-				b.WriteString(line + "\n")
+				b.WriteString(prefix + s + "\n")
 			}
 		}
-		b.WriteString(styleDictHelp.Render("↑/↓ or j/k: move  Enter: search  ESC: back  q: quit"))
+		b.WriteString(styleHelp.Render("\n↑/↓ or j/k: move  Enter: search  ESC: back  q: quit"))
 
 	case dictStepResults:
-		if len(m.results) == 0 {
-			b.WriteString("No commits found.\n\n")
+		if m.searchMode == "type" {
+			b.WriteString(fmt.Sprintf("Type: %s\n\n", styleSelected.Render(m.selectedType)))
 		} else {
-			if m.searchMode == "type" {
-				b.WriteString(fmt.Sprintf("Commits with type: %s\n\n", styleDictType.Render(m.selectedType)))
-			} else {
-				b.WriteString(fmt.Sprintf("Commits with scope: %s\n\n", styleDictScope.Render(m.selectedScope)))
-			}
+			b.WriteString(fmt.Sprintf("Scope: %s\n\n", styleSelected.Render(m.selectedScope)))
+		}
 
+		if len(m.results) == 0 {
+			b.WriteString("No commits found.\n")
+		} else {
 			start := m.resultsCursor
+			if start > len(m.results)-1 {
+				start = len(m.results) - 1
+			}
 			end := start + 5
 			if end > len(m.results) {
 				end = len(m.results)
@@ -271,52 +235,38 @@ func (m *tagDictModel) View() string {
 
 			for i := start; i < end; i++ {
 				result := m.results[i]
-				marker := "  "
+				prefix := "  "
 				if i == m.resultsCursor {
-					marker = "❯ "
+					prefix = "❯ "
 				}
 
-				typeStr := styleDictType.Render(result.Type)
-				scopeStr := styleDictScope.Render(result.Scope)
 				hashStr := result.Hash[:7]
+				commitLine := fmt.Sprintf("%s[%s] %s(%s): %s",
+					prefix, hashStr, result.Type, result.Scope, result.Subject)
 
-				b.WriteString(fmt.Sprintf("%s[%s] %s(%s): %s\n",
-					marker, hashStr, typeStr, scopeStr, result.Subject))
+				if i == m.resultsCursor {
+					b.WriteString(styleSelected.Render(commitLine) + "\n")
+				} else {
+					b.WriteString(commitLine + "\n")
+				}
 			}
 
 			b.WriteString("\n")
-			b.WriteString(styleDictResult.Render(
-				fmt.Sprintf("Showing %d-%d of %d results", start+1, end, len(m.results)),
+			b.WriteString(styleHelp.Render(
+				fmt.Sprintf("Showing %d-%d of %d  |  ↑/↓: scroll  ESC: back  q: quit",
+					start+1, end, len(m.results)),
 			))
-			b.WriteString("\n")
 		}
-		b.WriteString(styleDictHelp.Render("↑/↓ or j/k: scroll  q or ESC: quit"))
 	}
 
 	return b.String()
 }
 
-// processTagDictCommand handles the tagdict subcommand
 func processTagDictCommand(args []string) error {
 	p := tea.NewProgram(newTagDictModel())
-	finalModel, err := p.Run()
+	_, err := p.Run()
 	if err != nil {
 		return fmt.Errorf("UI error: %v", err)
 	}
-
-	m, ok := finalModel.(*tagDictModel)
-	if !ok {
-		return fmt.Errorf("failed to get final model")
-	}
-
-	if m.canceled {
-		fmt.Println("\n" + styleDictHelp.Render("Search canceled."))
-		return nil
-	}
-
-	if m.err != nil {
-		return fmt.Errorf("search error: %v", m.err)
-	}
-
 	return nil
 }
