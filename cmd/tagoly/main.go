@@ -263,6 +263,12 @@ func main() {
 				os.Exit(1)
 			}
 			return
+		case "tagdict":
+			if err := processTagDictCommand(os.Args[2:]); err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
 		case "help", "-h", "--help":
 			printHelp()
 			return
@@ -334,17 +340,22 @@ func printHelp() {
 
 USAGE:
   tagoly                          Run interactive commit creation
+  tagoly tagdict                  Interactive search by tag or scope (Recommended)
   tagoly search [options]         Search commits by type, scope, or subject
   tagoly help                     Show this help message
   tagoly version                  Show version
 
-SEARCH OPTIONS:
+TAGDICT (Interactive Search):
+  tagoly tagdict                  Select tag or scope interactively to search commits
+
+SEARCH OPTIONS (Direct search with flags):
   -type <type>                    Filter by commit type (e.g., feat, fix, docs)
   -scope <scope>                  Filter by scope (e.g., auth, api)
   -subject <text>                 Filter by subject text (substring match)
   -limit <number>                 Maximum number of results (0 = all)
 
 EXAMPLES:
+  tagoly tagdict                  Open interactive tag search (Recommended)
   tagoly search -type feat        Show all feature commits
   tagoly search -scope auth       Show all commits in auth scope
   tagoly search -type fix -limit 10  Show last 10 bug fixes
