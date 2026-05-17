@@ -62,6 +62,23 @@ func GetCommitHistory(limit int) ([]CommitRecord, error) {
 		args = append([]string{"log", "-n", fmt.Sprintf("%d", limit)}, "--pretty=format:%H%n%B%n---COMMIT_SEPARATOR---")
 	}
 
+	return getCommitHistory(args)
+}
+
+// GetCommitHistoryRange retrieves commits in a revision range, such as main..HEAD.
+func GetCommitHistoryRange(revRange string, limit int) ([]CommitRecord, error) {
+	args := []string{"log"}
+	if limit > 0 {
+		args = append(args, "-n", fmt.Sprintf("%d", limit))
+	}
+	if strings.TrimSpace(revRange) != "" {
+		args = append(args, revRange)
+	}
+	args = append(args, "--pretty=format:%H%n%B%n---COMMIT_SEPARATOR---")
+	return getCommitHistory(args)
+}
+
+func getCommitHistory(args []string) ([]CommitRecord, error) {
 	cmd := exec.Command("git", args...)
 	out, err := cmd.Output()
 	if err != nil {

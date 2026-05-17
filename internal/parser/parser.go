@@ -2,6 +2,7 @@ package parser
 
 import (
 	"regexp"
+	"strings"
 )
 
 // ParsedCommit represents a parsed commit message in Tagoly format
@@ -20,7 +21,8 @@ var commitsRegex = regexp.MustCompile(`^([a-z]+)(?:\(([^)]+)\))?:\s+(.+)$`)
 // ParseCommitMessage parses a commit message in Tagoly format
 // Returns ParsedCommit if format is valid, otherwise returns nil
 func ParseCommitMessage(hash, message string) *ParsedCommit {
-	matches := commitsRegex.FindStringSubmatch(message)
+	subjectLine := firstLine(message)
+	matches := commitsRegex.FindStringSubmatch(subjectLine)
 	if matches == nil {
 		return nil // Not in Tagoly format
 	}
@@ -40,11 +42,20 @@ func ParseCommitMessage(hash, message string) *ParsedCommit {
 		Type:    matches[1],
 		Scope:   scope,
 		Subject: matches[3],
-		Raw:     message,
+		Raw:     subjectLine,
 	}
 }
 
 // IsValidCommitFormat checks if a message is in valid Tagoly format
 func IsValidCommitFormat(message string) bool {
-	return commitsRegex.MatchString(message)
+	return commitsRegex.MatchString(firstLine(message))
+}
+
+func firstLine(message string) string {
+	message = strings.TrimSpace(message)
+	if message == "" {
+		return ""
+	}
+	line, _, _ := strings.Cut(message, "\n")
+	return strings.TrimSpace(line)
 }

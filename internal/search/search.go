@@ -1,6 +1,7 @@
 package search
 
 import (
+	"sort"
 	"strings"
 	"tagoly/internal/git"
 	"tagoly/internal/parser"
@@ -86,6 +87,30 @@ func SearchByTypeAndScope(commitType, scope string, limit int) ([]SearchResult, 
 		Scope: scope,
 		Limit: limit,
 	})
+}
+
+// AvailableScopes returns scopes found in Tagoly-formatted commit history.
+func AvailableScopes() ([]string, error) {
+	records, err := git.GetCommitHistory(0)
+	if err != nil {
+		return nil, err
+	}
+
+	seen := map[string]bool{}
+	for _, record := range records {
+		parsed := parser.ParseCommitMessage(record.Hash, record.Message)
+		if parsed == nil {
+			continue
+		}
+		seen[parsed.Scope] = true
+	}
+
+	scopes := make([]string, 0, len(seen))
+	for scope := range seen {
+		scopes = append(scopes, scope)
+	}
+	sort.Strings(scopes)
+	return scopes, nil
 }
 
 // matchesFilters checks if a parsed commit matches all search filters

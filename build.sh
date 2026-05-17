@@ -9,15 +9,15 @@ echo "🔨 Building tagoly binaries..."
 rm -f tagoly-darwin-amd64 tagoly-darwin-arm64 tagoly-linux-amd64 tagoly-linux-arm64 tagoly-windows-amd64.exe
 
 # Mac用
-GOOS=darwin GOARCH=amd64 go build -o tagoly-darwin-amd64 cmd/tagoly/main.go
-GOOS=darwin GOARCH=arm64 go build -o tagoly-darwin-arm64 cmd/tagoly/main.go
+GOOS=darwin GOARCH=amd64 go build -o tagoly-darwin-amd64 ./cmd/tagoly
+GOOS=darwin GOARCH=arm64 go build -o tagoly-darwin-arm64 ./cmd/tagoly
 
 # Linux用
-GOOS=linux GOARCH=amd64 go build -o tagoly-linux-amd64 cmd/tagoly/main.go
-GOOS=linux GOARCH=arm64 go build -o tagoly-linux-arm64 cmd/tagoly/main.go
+GOOS=linux GOARCH=amd64 go build -o tagoly-linux-amd64 ./cmd/tagoly
+GOOS=linux GOARCH=arm64 go build -o tagoly-linux-arm64 ./cmd/tagoly
 
 # Windows用
-GOOS=windows GOARCH=amd64 go build -o tagoly-windows-amd64.exe cmd/tagoly/main.go
+GOOS=windows GOARCH=amd64 go build -o tagoly-windows-amd64.exe ./cmd/tagoly
 
 echo "✅ All builds completed successfully!"
 ls -lh tagoly-*

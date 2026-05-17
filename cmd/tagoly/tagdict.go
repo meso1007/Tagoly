@@ -44,9 +44,9 @@ func newTagDictModel() *tagDictModel {
 		}
 	}
 
-	scopes := []string{
-		"root", "auth", "api", "ui", "db",
-		"config", "test", "docs", "ci", "perf",
+	scopes, err := search.AvailableScopes()
+	if err != nil || len(scopes) == 0 {
+		scopes = []string{"root"}
 	}
 
 	return &tagDictModel{

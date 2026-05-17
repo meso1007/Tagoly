@@ -46,6 +46,17 @@ tagoly search -scope auth
 tagoly search -subject login -limit 10
 ```
 
+### lint - コミットメッセージ検証
+```bash
+tagoly lint -message "feat(api): add endpoint"
+tagoly lint -range main..HEAD
+```
+
+### install-hook - commit-msg hook の導入
+```bash
+tagoly install-hook
+```
+
 ### コミット作成（デフォルト）
 ```bash
 git add .

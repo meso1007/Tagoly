@@ -18,11 +18,12 @@ func LoadConfig() (*Config, error) {
 	if _, err := os.Stat(".tagolycustom"); err == nil {
 		data, err := os.ReadFile(".tagolycustom")
 		if err != nil {
-			if err := json.Unmarshal(data, cfg); err != nil {
-				return nil, fmt.Errorf("invalid json in .tagolycustom: %w", err)
-			}
-			return cfg, nil
+			return nil, err
 		}
+		if err := json.Unmarshal(data, cfg); err != nil {
+			return nil, fmt.Errorf("invalid json in .tagolycustom: %w", err)
+		}
+		return cfg, nil
 	}
 
 	home, err := os.UserHomeDir()
@@ -37,6 +38,8 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return cfg, err
 	}
-	json.Unmarshal(data, cfg)
+	if err := json.Unmarshal(data, cfg); err != nil {
+		return nil, fmt.Errorf("invalid json in %s: %w", file, err)
+	}
 	return cfg, nil
 }

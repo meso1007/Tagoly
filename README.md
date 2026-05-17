@@ -34,6 +34,8 @@ It guides each commit interactively and helps keep scopes and tags structured ac
 - **Interactive commit flow** for selecting type, scope, and subject in a clear step-by-step prompt.
 - **Smart scope suggestion** when multiple scopes are detected, with manual override when needed.
 - **Custom tags** via `.tagolycustom` (for example, `ci`, `perf`, `hotfix`).
+- **Commit message linting** for validating team commit rules locally or in CI.
+- **Git hook installation** to enforce Tagoly format through `commit-msg`.
 
 ## Quick Start
 
@@ -126,7 +128,8 @@ Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
 
 ## Configuration
 
-Create `.tagolycustom` in your repository root:
+Create `.tagolycustom` in your repository root to share custom commit types with your team.  
+Tagoly checks the repository `.tagolycustom` first, then falls back to `~/.tagolycustom`.
 
 ```json
 {
@@ -139,12 +142,111 @@ Create `.tagolycustom` in your repository root:
 }
 ```
 
+### `.tagolycustom` examples
+
+For product teams:
+
+```json
+{
+  "customTags": [
+    { "key": "ux", "label": "User experience changes" },
+    { "key": "copy", "label": "Text or content updates" },
+    { "key": "experiment", "label": "A/B test or experiment changes" }
+  ]
+}
+```
+
+For platform or infrastructure teams:
+
+```json
+{
+  "customTags": [
+    { "key": "ci", "label": "CI/CD changes" },
+    { "key": "infra", "label": "Infrastructure changes" },
+    { "key": "perf", "label": "Performance improvement" },
+    { "key": "security", "label": "Security-related changes" }
+  ]
+}
+```
+
+Custom tag keys should be lowercase letters because Tagoly commit parsing currently expects the `type(scope): subject` type to use lowercase alphabetic keys.
+
 ## Usage
+
+### Create a commit
+
+Stage your changes, then run Tagoly:
 
 ```bash
 git add .
 tagoly
 ```
+
+Tagoly will guide you through:
+
+- selecting a commit type
+- selecting or confirming the detected scope
+- entering the commit subject
+- confirming the generated commit message
+
+Generated messages follow this format:
+
+```text
+feat(api): add endpoint
+fix(auth): handle expired session
+docs(root): update onboarding notes
+```
+
+### Search commit history
+
+Use `tagoly tagdict` for interactive search by commit type or scope:
+
+```bash
+tagoly tagdict
+```
+
+Use `tagoly search` when you already know the filter:
+
+```bash
+tagoly search -type feat
+tagoly search -scope auth
+tagoly search -subject login
+tagoly search -type fix -limit 10
+```
+
+### Validate commit messages
+
+Use `tagoly lint` to check whether commit messages follow the Tagoly format:
+
+```bash
+tagoly lint -message "feat(api): add endpoint"
+tagoly lint -message-file .git/COMMIT_EDITMSG
+tagoly lint -range main..HEAD
+```
+
+`lint` returns a non-zero exit code when a message is invalid, so it can be used in local scripts or CI.
+
+### Install the commit hook
+
+Install a `commit-msg` hook to reject invalid commit messages before they enter the repository:
+
+```bash
+tagoly install-hook
+```
+
+If a `commit-msg` hook already exists, Tagoly will not overwrite it by default. To replace it:
+
+```bash
+tagoly install-hook -force
+```
+
+The installed hook runs:
+
+```bash
+tagoly lint -message-file "$1"
+```
+
+This is useful for teams because developers can still write commits manually, while the repository keeps the same commit format.
 
 ## Before / After
 

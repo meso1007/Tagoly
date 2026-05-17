@@ -13,6 +13,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const version = "1.2.0"
+
 // --- Warm Minimal Palette ---
 var (
 	brandColor = lipgloss.Color("#A3E635") // 鮮やかでモダンなライムグリーン
@@ -269,11 +271,23 @@ func main() {
 				os.Exit(1)
 			}
 			return
+		case "lint":
+			if err := processLintCommand(os.Args[2:]); err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		case "install-hook":
+			if err := processInstallHookCommand(os.Args[2:]); err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
 		case "help", "-h", "--help":
 			printHelp()
 			return
 		case "version", "-v", "--version":
-			fmt.Println("tagoly version 1.0.0")
+			fmt.Printf("tagoly version %s\n", version)
 			return
 		}
 	}
@@ -342,6 +356,8 @@ USAGE:
   tagoly                          Run interactive commit creation
   tagoly tagdict                  Interactive search by tag or scope (Recommended)
   tagoly search [options]         Search commits by type, scope, or subject
+  tagoly lint [options]           Validate commit message format
+  tagoly install-hook [--force]   Install the commit-msg validation hook
   tagoly help                     Show this help message
   tagoly version                  Show version
 
@@ -354,12 +370,24 @@ SEARCH OPTIONS (Direct search with flags):
   -subject <text>                 Filter by subject text (substring match)
   -limit <number>                 Maximum number of results (0 = all)
 
+LINT OPTIONS:
+  -message <message>              Validate a single commit message
+  -message-file <path>            Validate a commit message file
+  -range <rev-range>              Validate commits in a Git revision range
+  -limit <number>                 Maximum number of commits with -range (0 = all)
+
+INSTALL-HOOK OPTIONS:
+  --force                         Overwrite an existing commit-msg hook
+
 EXAMPLES:
   tagoly tagdict                  Open interactive tag search (Recommended)
   tagoly search -type feat        Show all feature commits
   tagoly search -scope auth       Show all commits in auth scope
   tagoly search -type fix -limit 10  Show last 10 bug fixes
   tagoly search -subject login    Show commits containing "login" in subject
+  tagoly lint -message "feat(api): add endpoint"
+  tagoly lint -range main..HEAD
+  tagoly install-hook
 
 For more information, visit: https://github.com/meso1007/tagoly
 `

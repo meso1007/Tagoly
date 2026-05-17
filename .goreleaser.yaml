@@ -16,7 +16,8 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./...
+  - main: ./cmd/tagoly
+    binary: tagoly
     env:
       - CGO_ENABLED=0
     goos:
