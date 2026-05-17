@@ -15,3 +15,5 @@ Thumbs.db
 
 # Go バイナリ
 bin/
+# Added by goreleaser init:
+dist/

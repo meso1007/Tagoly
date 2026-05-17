@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"strings"
 	"tagoly/internal/search"
 
 	"github.com/charmbracelet/lipgloss"
@@ -12,9 +10,6 @@ import (
 
 // --- Styling for search output ---
 var (
-	brandColor  = lipgloss.Color("#A3E635")
-	textColor   = lipgloss.Color("#0F172A")
-	textMuted   = lipgloss.Color("#6B7280")
 	accentType  = lipgloss.Color("#EC4899")
 	accentScope = lipgloss.Color("#06B6D4")
 

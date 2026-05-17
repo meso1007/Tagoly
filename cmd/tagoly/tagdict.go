@@ -7,7 +7,6 @@ import (
 	"tagoly/internal/search"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type dictStep int
