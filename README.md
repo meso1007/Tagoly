@@ -189,6 +189,14 @@ Tagoly will guide you through:
 - entering the commit subject
 - confirming the generated commit message
 
+For scripts or agents without a TTY, use `tagoly commit` with flags:
+
+```bash
+tagoly commit -type fix -scope frontend -subject "fix CSS class mismatch"
+```
+
+If `-scope` is omitted, Tagoly uses the detected scope from staged files.
+
 Generated messages follow this format:
 
 ```text

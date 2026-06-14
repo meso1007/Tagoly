@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -259,6 +260,12 @@ func main() {
 		subcommand := os.Args[1]
 
 		switch subcommand {
+		case "commit":
+			if err := processCommitCommand(os.Args[2:]); err != nil {
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
 		case "search":
 			if err := processSearchCommand(os.Args[2:]); err != nil {
 				fmt.Printf("Error: %v\n", err)
@@ -294,6 +301,52 @@ func main() {
 
 	// Default behavior: interactive commit creation
 	runInteractiveCommit()
+}
+
+func processCommitCommand(args []string) error {
+	fs := flag.NewFlagSet("commit", flag.ContinueOnError)
+	fs.SetOutput(os.Stdout)
+
+	commitType := fs.String("type", "", "Commit type (e.g., feat, fix, docs)")
+	scope := fs.String("scope", "", "Commit scope (defaults to detected staged-file scope)")
+	subject := fs.String("subject", "", "Commit subject")
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	if *commitType == "" && *scope == "" && *subject == "" {
+		runInteractiveCommit()
+		return nil
+	}
+
+	if strings.TrimSpace(*commitType) == "" {
+		return fmt.Errorf("-type is required for non-interactive commit")
+	}
+	if strings.TrimSpace(*subject) == "" {
+		return fmt.Errorf("-subject is required for non-interactive commit")
+	}
+	if !git.HasStagedChanges() {
+		return fmt.Errorf("no staged files to commit; please run 'git add' first")
+	}
+
+	finalScope := strings.TrimSpace(*scope)
+	if finalScope == "" {
+		changedFiles, err := git.GetChangedFiles()
+		if err != nil {
+			return err
+		}
+		defaultScope, _ := generator.DetectScopeWithListImproved(changedFiles)
+		finalScope = defaultScope
+	}
+
+	message := fmt.Sprintf("%s(%s): %s", strings.TrimSpace(*commitType), finalScope, strings.TrimSpace(*subject))
+	if err := git.Commit(message); err != nil {
+		return err
+	}
+
+	fmt.Printf("Committed: %s\n", message)
+	return nil
 }
 
 func runInteractiveCommit() {
@@ -354,6 +407,7 @@ func printHelp() {
 
 USAGE:
   tagoly                          Run interactive commit creation
+  tagoly commit [options]         Create a commit interactively or with flags
   tagoly tagdict                  Interactive search by tag or scope (Recommended)
   tagoly search [options]         Search commits by type, scope, or subject
   tagoly lint [options]           Validate commit message format
@@ -363,6 +417,11 @@ USAGE:
 
 TAGDICT (Interactive Search):
   tagoly tagdict                  Select tag or scope interactively to search commits
+
+COMMIT OPTIONS:
+  -type <type>                    Commit type (e.g., feat, fix, docs)
+  -scope <scope>                  Commit scope (defaults to detected staged-file scope)
+  -subject <subject>              Commit subject
 
 SEARCH OPTIONS (Direct search with flags):
   -type <type>                    Filter by commit type (e.g., feat, fix, docs)
@@ -380,6 +439,7 @@ INSTALL-HOOK OPTIONS:
   --force                         Overwrite an existing commit-msg hook
 
 EXAMPLES:
+  tagoly commit -type fix -scope frontend -subject "fix CSS class mismatch"
   tagoly tagdict                  Open interactive tag search (Recommended)
   tagoly search -type feat        Show all feature commits
   tagoly search -scope auth       Show all commits in auth scope
