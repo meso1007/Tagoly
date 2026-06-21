@@ -9,12 +9,14 @@ import (
 	"tagoly/internal/generator"
 	"tagoly/internal/git"
 	"tagoly/internal/prompt"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-const version = "1.2.0"
+const version = "1.3.0"
+const cursorBlinkInterval = 530 * time.Millisecond
 
 // --- Warm Minimal Palette ---
 var (
@@ -58,10 +60,14 @@ type model struct {
 	selectedType  prompt.CommitType
 	selectedScope string
 	subject       string
+	subjectCursor int
+	cursorVisible bool
 	committed     bool
 	canceled      bool
 	err           error
 }
+
+type cursorBlinkMsg struct{}
 
 func defaultCommitTypes() []prompt.CommitType {
 	return []prompt.CommitType{
@@ -106,8 +112,20 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
+func blinkCursor() tea.Cmd {
+	return tea.Tick(cursorBlinkInterval, func(time.Time) tea.Msg {
+		return cursorBlinkMsg{}
+	})
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case cursorBlinkMsg:
+		if m.step != stepSubject {
+			return m, nil
+		}
+		m.cursorVisible = !m.cursorVisible
+		return m, blinkCursor()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -151,24 +169,37 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.selectedScope = m.scopeOptions[m.cursor]
 				m.step = stepSubject
 				m.cursor = 0
+				m.cursorVisible = true
+				return m, blinkCursor()
 			}
 		case stepSubject:
 			switch msg.String() {
 			case "enter":
 				m.subject = strings.TrimSpace(m.subject)
+				m.subjectCursor = len([]rune(m.subject))
 				if m.subject != "" {
 					m.step = stepConfirm
 					m.cursor = 0
 				}
-			case "backspace":
-				if len(m.subject) > 0 {
-					m.subject = m.subject[:len(m.subject)-1]
+			case "left", "ctrl+b":
+				if m.subjectCursor > 0 {
+					m.subjectCursor--
 				}
+			case "right", "ctrl+f":
+				if m.subjectCursor < len([]rune(m.subject)) {
+					m.subjectCursor++
+				}
+			case "ctrl+u", "ctrl+k", "alt+backspace", "delete":
+				m.subject = ""
+				m.subjectCursor = 0
+			case "backspace":
+				m.subject, m.subjectCursor = deleteRuneBeforeCursor(m.subject, m.subjectCursor)
 			default:
 				if len(msg.Runes) > 0 {
-					m.subject += string(msg.Runes)
+					m.subject, m.subjectCursor = insertRunesAtCursor(m.subject, m.subjectCursor, msg.Runes)
 				}
 			}
+			m.cursorVisible = true
 		case stepConfirm:
 			switch msg.String() {
 			case "left", "h", "up", "k":
@@ -197,6 +228,62 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) finalMessage() string {
 	return fmt.Sprintf("%s(%s): %s", m.selectedType.Key, m.selectedScope, strings.TrimSpace(m.subject))
+}
+
+func insertRunesAtCursor(input string, cursor int, runes []rune) (string, int) {
+	existing := []rune(input)
+	cursor = clampCursor(cursor, len(existing))
+
+	next := make([]rune, 0, len(existing)+len(runes))
+	next = append(next, existing[:cursor]...)
+	next = append(next, runes...)
+	next = append(next, existing[cursor:]...)
+
+	return string(next), cursor + len(runes)
+}
+
+func deleteRuneBeforeCursor(input string, cursor int) (string, int) {
+	existing := []rune(input)
+	cursor = clampCursor(cursor, len(existing))
+	if cursor == 0 {
+		return input, cursor
+	}
+
+	next := make([]rune, 0, len(existing)-1)
+	next = append(next, existing[:cursor-1]...)
+	next = append(next, existing[cursor:]...)
+
+	return string(next), cursor - 1
+}
+
+func clampCursor(cursor, length int) int {
+	if cursor < 0 {
+		return 0
+	}
+	if cursor > length {
+		return length
+	}
+	return cursor
+}
+
+func renderSubjectInput(subject string, cursor int, cursorVisible bool) string {
+	runes := []rune(subject)
+	cursor = clampCursor(cursor, len(runes))
+
+	if cursor == len(runes) {
+		if !cursorVisible {
+			return string(runes) + " "
+		}
+		return string(runes) + styleSelected.Reverse(true).Render(" ")
+	}
+
+	before := string(runes[:cursor])
+	current := string(runes[cursor])
+	if cursorVisible {
+		current = styleSelected.Reverse(true).Render(current)
+	}
+	after := string(runes[cursor+1:])
+	return before + current + after
 }
 
 func (m model) View() string {
@@ -235,8 +322,8 @@ func (m model) View() string {
 		b.WriteString(fmt.Sprintf("Type: %s  Scope: %s\n\n", styleSelected.Render(m.selectedType.Key), styleSelected.Render(m.selectedScope)))
 		b.WriteString("Enter commit subject:\n")
 		// 入力中のテキストの後に改行を「2つ」入れて、ヘルプテキストを確実に押し下げる
-		b.WriteString(styleSelected.Render("❯ ") + m.subject + "\n\n")
-		b.WriteString(styleHelp.Render("Type text  Backspace: delete  Enter: continue  q: quit"))
+		b.WriteString(styleSelected.Render("❯ ") + renderSubjectInput(m.subject, m.subjectCursor, m.cursorVisible) + "\n\n")
+		b.WriteString(styleHelp.Render("Type text  ←/→: move cursor  Backspace: delete  Ctrl+U/Ctrl+K/Delete: clear  Enter: continue  q: quit"))
 	case stepConfirm:
 		b.WriteString("Confirm commit message:\n\n")
 		b.WriteString("  " + styleSelected.Render(m.finalMessage()) + "\n\n")
