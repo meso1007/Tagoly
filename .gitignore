@@ -2,6 +2,7 @@
 .tagoly.json
 
 # ビルド成果物
+/tagoly
 tagoly-darwin-*
 tagoly-linux-*
 tagoly-windows-*.exe
