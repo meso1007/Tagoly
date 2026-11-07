@@ -6,16 +6,23 @@
   </a>
 
 <p>
-    <strong>The digital home for Tagoly — The smarter Git commit CLI.</strong><br />
-    A high-performance landing page designed to showcase features, streamline installation, and onboard developers.
+    <strong>A smart Git commit CLI that keeps your commit history consistent.</strong><br />
+    Tagoly guides every commit interactively, detects scopes from staged files, and can lint messages in CI.
   </p>
 
 <p align="center">
-  <a href="https://www.tagoly-lp.us/"><b>Live Site</b></a>
+  <a href="https://github.com/meso1007/Tagoly/releases/latest"><img src="https://img.shields.io/github/v/release/meso1007/Tagoly?style=flat-square" alt="Latest release" /></a>
+  <a href="https://github.com/meso1007/Tagoly/blob/main/go.mod"><img src="https://img.shields.io/github/go-mod/go-version/meso1007/Tagoly?style=flat-square" alt="Go version" /></a>
+  <a href="https://github.com/meso1007/Tagoly/blob/main/LICENSE"><img src="https://img.shields.io/github/license/meso1007/Tagoly?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/meso1007/homebrew-tagoly"><img src="https://img.shields.io/badge/Homebrew-available-orange?style=flat-square&logo=homebrew&logoColor=white" alt="Homebrew" /></a>
+</p>
+
+<p align="center">
+  <a href="https://www.tagoly-lp.us/"><b>Website</b></a>
   &nbsp;&nbsp;︱&nbsp;&nbsp;
-  <a href="https://github.com/meso1007/tagoly"><b>Tagoly CLI</b></a>
+  <a href="https://github.com/meso1007/Tagoly-JP"><b>日本語版 (Tagoly-JP)</b></a>
   &nbsp;&nbsp;︱&nbsp;&nbsp;
-  <a href="https://github.com/meso1007/tagoly-lp"><b>Togoly LP</b></a>
+  <a href="#installation"><b>Install</b></a>
 </p>
 </div>
 
@@ -61,6 +68,9 @@ tagoly
 
 ## Installation
 
+Every release ships prebuilt binaries for macOS, Linux, and Windows on the
+[Releases page](https://github.com/meso1007/Tagoly/releases).
+
 ### macOS
 
 Homebrew:
@@ -76,14 +86,16 @@ Manual install (ensure destination directory is in your `PATH`):
 Apple Silicon:
 
 ```bash
-mv tagoly-darwin-arm64 /usr/local/bin/tagoly
+tar -xzf Tagoly_Darwin_arm64.tar.gz
+mv tagoly /usr/local/bin/tagoly
 chmod +x /usr/local/bin/tagoly
 ```
 
 Intel:
 
 ```bash
-mv tagoly-darwin-amd64 /usr/local/bin/tagoly
+tar -xzf Tagoly_Darwin_x86_64.tar.gz
+mv tagoly /usr/local/bin/tagoly
 chmod +x /usr/local/bin/tagoly
 ```
 
@@ -99,14 +111,16 @@ brew install meso1007/tagoly/tagoly
 Manual install (AMD64):
 
 ```bash
-mv tagoly-linux-amd64 /usr/local/bin/tagoly
+tar -xzf Tagoly_Linux_x86_64.tar.gz
+mv tagoly /usr/local/bin/tagoly
 chmod +x /usr/local/bin/tagoly
 ```
 
 Manual install (ARM64):
 
 ```bash
-mv tagoly-linux-arm64 /usr/local/bin/tagoly
+tar -xzf Tagoly_Linux_arm64.tar.gz
+mv tagoly /usr/local/bin/tagoly
 chmod +x /usr/local/bin/tagoly
 ```
 
@@ -123,7 +137,8 @@ tagoly --version
 Manual install (ensure `C:\Program Files\tagoly` is in `PATH`):
 
 ```powershell
-Move-Item .\tagoly-windows-amd64.exe "C:\Program Files\tagoly\tagoly.exe"
+Expand-Archive .\Tagoly_Windows_x86_64.zip -DestinationPath .
+Move-Item .\tagoly.exe "C:\Program Files\tagoly\tagoly.exe"
 ```
 
 ## Configuration
@@ -270,9 +285,15 @@ This is useful for teams because developers can still write commits manually, wh
 
 ## Related Repositories
 
-- [meso1007/tagoly](https://github.com/meso1007/tagoly)
-- [meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly)
-- [meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly)
+- [meso1007/Tagoly](https://github.com/meso1007/Tagoly) — this CLI (English)
+- [meso1007/Tagoly-JP](https://github.com/meso1007/Tagoly-JP) — Japanese version
+- [meso1007/Tagoly-LP](https://github.com/meso1007/Tagoly-LP) — official landing page
+- [meso1007/homebrew-tagoly](https://github.com/meso1007/homebrew-tagoly) — Homebrew tap
+- [meso1007/scoop-tagoly](https://github.com/meso1007/scoop-tagoly) — Scoop bucket
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup and commit conventions.
 
 ---
 
